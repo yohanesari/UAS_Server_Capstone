@@ -293,10 +293,30 @@ def create_blog(request, payload: BlogIn):
     blog = Blog.objects.create(**payload.dict())
     return blog
 
+def load_dummy_blog():
+    with open("dummy-data/blogs.json", "r") as f:
+        return json.load(f)
+    
 @api.get("blogs.json", response=List[BlogOut])
 def list_blogs(request):
-    blogs = Blog.objects.all()
-    return blogs
+    DUMMY_BLOG = load_dummy_blog()
+    all_blog = [
+        {
+            "commentable": blog["commentable"],
+            "created_at": blog["created_at"],
+            "feedburner": blog["feedburner"],
+            "feedburner_location": blog["feedburner_location"],
+            "handle": blog["handle"],
+            "id": blog["id"],
+            "tags": blog["tags"],
+            "template_suffix": blog["template_suffix"],
+            "title": blog["title"],
+            "updated_at": blog["updated_at"],
+            "admin_graphql_api_id": f"gid://shopify/OnlineStoreBlog/{blog['id']}"
+        }
+        for blog in DUMMY_BLOG
+    ]
+    return all_blog
 
 @api.get("blogs/{blog_id}.json", response=BlogOut)
 def get_blog(request, blog_id: int):
@@ -350,11 +370,39 @@ def disable_gift_card(request, gift_card_id: int):
     except GiftCard.DoesNotExist:
         raise HttpError(404, "Gift card not found")
 
+def load_dummy_giftcards():
+    with open("dummy-data/giftcard.json", "r") as f:
+        return json.load(f)
+    
 #retrive list giftcard
 @api.get("giftcards.json", auth=apiAuth, response=List[GiftCardOut])
 def list_gift_cards(request):
-    gift_cards = GiftCard.objects.all()
-    return gift_cards
+    DUMMY_GIFTCARDS = load_dummy_giftcards() 
+    all_giftcards = [
+        {
+            "api_client_id": giftcard["api_client_id"],
+            "balance": giftcard["balance"],
+            "code": giftcard["code"],
+            "created_at": giftcard["created_at"],
+            "currency": giftcard["currency"],
+            "customer_id": giftcard["customer_id"],
+            "disabled_at": giftcard["disabled_at"],
+            "expires_on": giftcard["expires_on"],
+            "id": giftcard["id"],
+            "initial_value": giftcard["initial_value"],
+            "last_characters": giftcard["last_characters"],
+            "line_item_id": giftcard["line_item_id"],
+            "note": giftcard["note"],
+            "order_id": giftcard["order_id"],
+            "template_suffix": giftcard["template_suffix"],
+            "user_id": giftcard["user_id"],
+            "updated_at": giftcard["updated_at"],
+            "admin_graphql_api_id": f"gid://shopify/GiftCard/{giftcard['id']}"
+        }
+        for giftcard in DUMMY_GIFTCARDS
+    ]
+    return all_giftcards
+
 
 #Retrieve spesific giftcard
 @api.get("giftcards/{gift_card_id}.json", auth=apiAuth, response=GiftCardOut)
@@ -394,11 +442,32 @@ def update_gift_card(request, gift_card_id: int, data: GiftCardIn):
     
 #Event
 
+def load_dummy_event():
+    with open("dummy-data/Event.json", "r") as f:
+        return json.load(f)
+    
 #Retrieve a list of event
-@api.get('events.json', response=List[EventOut])
-def list_events(request):
-    events = Event.objects.all()
-    return events
+@api.get("events.json", response=List[EventOut])
+def AllEvents(request):
+    DUMMY_EVENTS = load_dummy_event()
+    all_events = [
+        {
+            "arguments": event["arguments"],
+            "body": event["body"],
+            "created_at": event["created_at"],
+            "id": event["id"],
+            "description": event["description"],
+            "path": event["path"],
+            "message": event["message"],
+            "subject_id": event["subject_id"],
+            "subject_type": event["subject_type"],
+            "verb": event["verb"],
+            "admin_graphql_api_id": f"gid://shopify/Event/{event['id']}"
+        }
+        for event in DUMMY_EVENTS
+    ]
+    return all_events
+
 
 #retrieve a spesific of event
 @api.get('events/{event_id}.json', response=EventOut)
